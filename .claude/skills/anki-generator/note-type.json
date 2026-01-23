@@ -1,0 +1,286 @@
+{
+  "note_types": {
+    "language_cloze": {
+      "fields": {
+        "Text": {
+          "description": "Text for cloze deletion (used with {{cloze:Text}})",
+          "required": true
+        },
+        "clozeHint": {
+          "description": "Cloze hint (optional)",
+          "required": false
+        },
+        "hintNegative": {
+          "description": "Negative hint (optional)",
+          "required": false
+        },
+        "followUp": {
+          "description": "Follow-up information (optional)",
+          "required": false
+        }
+      },
+      "description": "Cloze deletion cards for language learning",
+      "used_in_decks": ["English", "French"]
+    },
+    "language_pattern": {
+      "fields": {
+        "source": {
+          "description": "Source word or phrase",
+          "required": true
+        },
+        "description1": {
+          "description": "Description for pattern 1",
+          "required": true
+        },
+        "description2": {
+          "description": "Description for pattern 2",
+          "required": false
+        },
+        "description3": {
+          "description": "Description for pattern 3",
+          "required": false
+        },
+        "description4": {
+          "description": "Description for pattern 4",
+          "required": false
+        },
+        "description5": {
+          "description": "Description for pattern 5",
+          "required": false
+        },
+        "sentence1": {
+          "description": "Example sentence for pattern 1",
+          "required": true
+        },
+        "sentence2": {
+          "description": "Example sentence for pattern 2",
+          "required": false
+        },
+        "sentence3": {
+          "description": "Example sentence for pattern 3",
+          "required": false
+        },
+        "sentence4": {
+          "description": "Example sentence for pattern 4",
+          "required": false
+        },
+        "sentence5": {
+          "description": "Example sentence for pattern 5",
+          "required": false
+        },
+        "sentenceAnswer1": {
+          "description": "Answer example sentence for pattern 1",
+          "required": true
+        },
+        "sentenceAnswer2": {
+          "description": "Answer example sentence for pattern 2",
+          "required": false
+        },
+        "sentenceAnswer3": {
+          "description": "Answer example sentence for pattern 3",
+          "required": false
+        },
+        "sentenceAnswer4": {
+          "description": "Answer example sentence for pattern 4",
+          "required": false
+        },
+        "sentenceAnswer5": {
+          "description": "Answer example sentence for pattern 5",
+          "required": false
+        },
+        "hintNegative1": {
+          "description": "Negative hint for pattern 1",
+          "required": false
+        },
+        "hintNegative2": {
+          "description": "Negative hint for pattern 2",
+          "required": false
+        },
+        "hintNegative3": {
+          "description": "Negative hint for pattern 3",
+          "required": false
+        },
+        "hintNegative4": {
+          "description": "Negative hint for pattern 4",
+          "required": false
+        },
+        "hintNegative5": {
+          "description": "Negative hint for pattern 5",
+          "required": false
+        },
+        "followUp1": {
+          "description": "Follow-up for pattern 1",
+          "required": false
+        },
+        "followUp2": {
+          "description": "Follow-up for pattern 2",
+          "required": false
+        },
+        "followUp3": {
+          "description": "Follow-up for pattern 3",
+          "required": false
+        },
+        "followUp4": {
+          "description": "Follow-up for pattern 4",
+          "required": false
+        },
+        "followUp5": {
+          "description": "Follow-up for pattern 5",
+          "required": false
+        }
+      },
+      "description": "Multiple card set for synonym learning",
+      "used_in_decks": ["English", "French"]
+    },
+    "language_polysemy": {
+      "fields": {
+        "vocabulary": {
+          "description": "Base form vocabulary",
+          "required": true
+        },
+        "vocabularyS": {
+          "description": "Third person singular form",
+          "required": false
+        },
+        "vocabularyPast": {
+          "description": "Past tense form",
+          "required": false
+        },
+        "vocabularyPastPerfect": {
+          "description": "Past perfect form",
+          "required": false
+        },
+        "vocabularyIng": {
+          "description": "Present continuous form",
+          "required": false
+        },
+        "pronunciation": {
+          "description": "Phonetic notation",
+          "required": true
+        },
+        "coreMeaning": {
+          "description": "Core meaning",
+          "required": true
+        },
+        "inputDefinition1": {
+          "description": "Definition for meaning 1",
+          "required": true
+        },
+        "inputDefinition2": {
+          "description": "Definition for meaning 2",
+          "required": false
+        },
+        "inputDefinition3": {
+          "description": "Definition for meaning 3",
+          "required": false
+        },
+        "inputDefinition4": {
+          "description": "Definition for meaning 4",
+          "required": false
+        },
+        "inputDefinition5": {
+          "description": "Definition for meaning 5",
+          "required": false
+        },
+        "example1": {
+          "description": "Example sentence for meaning 1",
+          "required": true
+        },
+        "example2": {
+          "description": "Example sentence for meaning 2",
+          "required": false
+        },
+        "example3": {
+          "description": "Example sentence for meaning 3",
+          "required": false
+        },
+        "example4": {
+          "description": "Example sentence for meaning 4",
+          "required": false
+        },
+        "example5": {
+          "description": "Example sentence for meaning 5",
+          "required": false
+        }
+      },
+      "description": "Cards for polysemous word learning",
+      "used_in_decks": ["English", "French"]
+    },
+    "language_vocab": {
+      "fields": {
+        "front": {
+          "description": "Front of card (word/phrase)",
+          "required": true
+        },
+        "back": {
+          "description": "Back of card (answer)",
+          "required": true
+        },
+        "pronunciation": {
+          "description": "Phonetic notation (optional)",
+          "required": false
+        }
+      },
+      "description": "Cards for basic vocabulary learning",
+      "used_in_decks": ["English", "French"]
+    },
+    "academic_cloze": {
+      "fields": {
+        "Text": {
+          "description": "Academic text for cloze deletion",
+          "required": true
+        },
+        "title": {
+          "description": "Card title",
+          "required": true
+        },
+        "figures": {
+          "description": "Charts and diagrams (optional)",
+          "required": false
+        },
+        "image": {
+          "description": "Image (optional)",
+          "required": false
+        },
+        "spoiler": {
+          "description": "Spoiler information (optional)",
+          "required": false
+        },
+        "source": {
+          "description": "Source file or reference (optional)",
+          "required": false
+        }
+      },
+      "description": "Cloze deletion cards for academic learning (math, statistics, global development, econometrics, etc.)",
+      "used_in_decks": ["Learn::Academic", "Learn::Math-Stat"]
+    },
+    "image_occlusion": {
+      "fields": {
+        "image": {
+          "description": "Image file for occlusion",
+          "required": true
+        },
+        "header": {
+          "description": "Header text (optional)",
+          "required": false
+        },
+        "back-note": {
+          "description": "Additional back information (optional)",
+          "required": false
+        },
+        "source": {
+          "description": "Source file or reference (optional)",
+          "required": false
+        }
+      },
+      "description": "Image occlusion cards for visual learning",
+      "used_in_decks": ["English", "French", "Learn::Academic", "Learn::Math-Stat"]
+    }
+  },
+  "decks_overview": {
+    "English": ["language_cloze", "language_pattern", "language_polysemy", "language_vocab", "image_occlusion"],
+    "French": ["language_cloze", "language_pattern", "language_polysemy", "language_vocab", "image_occlusion"],
+    "Learn::Academic": ["academic_cloze", "image_occlusion"],
+    "Learn::Math-Stat": ["academic_cloze", "image_occlusion"]
+  }
+}

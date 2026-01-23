@@ -1,0 +1,179 @@
+{
+  "note_types": [
+    {
+      "name": "academic_cloze",
+      "fields": [
+        "title",
+        "Text",
+        "figures",
+        "image",
+        "spoiler",
+        "source"
+      ],
+      "templates": {
+        "Cloze": {
+          "Front": "<div class=\"card-cloze\">\n    <div class=\"card-title\">{{title}}</div>\n    <div class=\"card-content\">\n        {{cloze:Text}} \n    </div>\n    {{#image}}\n        <div style=\"margin: 10px 0;\">{{image}}</div>\n    {{/image}}\n    {{#spoiler}}\n    <div class=\"centre-box\" onclick=\"this.innerHTML='{{spoiler}}'\">\n        [Show spoiler]\n    </div>\n    {{/spoiler}}\n</div>",
+          "Back": "<div class=\"card-cloze\">\n    <div class=\"card-title\">{{title}}</div>\n    <div class=\"card-content\">\n        {{cloze:Text}}\n    </div>\n    {{#source}}\n        Source: {{source}}\n    {{/source}}\n    {{#image}}\n        <div style=\"margin: 10px 0;\">{{image}}</div>\n    {{/image}}\n</div>"
+        }
+      },
+      "css": ":root {\n  --orange: #fb9f2a;\n  --medium-gray: #434343;\n}\n\n.card-cloze {\n    font-family: arial;\n    font-size: 20px;\n    text-align: center;\n    color: white;\n}\n.cloze {\n    font-weight: bold;\n    color: var(--orange);\n}\n.card-title {\n   color: orange;\n   padding: 10px 15px;\n   border-radius: 4px 4px 0 0;\n   font-size: 1.1em;\n}\n.card-content {\n   line-height: 1.6;\n   font-size: 1.2em;\n}\n.centre-box {\n   margin: 20px auto;\n   padding: 15px 10px;\n   border-radius: 6px;\n   font-size: 90%;\n   color: white;\n   line-height: 1.6;\n   cursor: pointer;\n   text-align: center;\n   display: block;\n   width: fit-content;\n   background-color: var(--medium-gray);\n   transition: all 0.2s ease;\n   font-weight: bold;\n}",
+      "is_cloze": true
+    },
+    {
+      "name": "language_cloze",
+      "fields": [
+        "Text",
+        "clozeHint",
+        "hintNegative",
+        "followUp"
+      ],
+      "templates": {
+        "Cloze": {
+          "Front": "<div class=\"card-cloze\">\n  {{cloze:Text}}\n</div>\n\n{{#hintNegative}}\n<div class=\"centre-box\" onclick=\"this.innerHTML='NOT: {{hintNegative}}'\">\nNOT: [Click to Show]\n</div>\n{{/hintNegative}}\n\n{{#clozeHint}}\n  <div class=\"text-block\">Spoiler</div>\n    <span>{{clozeHint}}</span>\n  </div>\n{{/clozeHint}}",
+          "Back": "<div class=\"card-cloze\">\n{{cloze:Text}}\n</div>\n\n{{#followUp}}\n  <div class=\"text-block\">Follow-up</div>\n  <span>{{followUp}}</span>\n{{/followUp}}"
+        }
+      },
+      "css": ":root {\n  --orange: #fb9f2a;\n  --medium-gray: #434343;\n}\n\n.card-cloze {\n    font-family: arial;\n    font-size: 20px;\n    text-align: center;\n    color: white;\n}\n.cloze {\n    font-weight: bold;\n    color: var(--orange);\n}\n.text-block {\n   display: block;\n   width: fit-content;\n   background-color: var(--orange);\n   padding: 0px 8px;\n   margin: 20px 20px 8px;\n   text-align: center;\n   line-height: 1.6;\n   font-size: 90%;\n   color: black;\n}\n.text-block + span {\n   display: block;\n   margin-left: 20px;\n   font-size: 85%;\n   line-height: 1.4;\n}\n.centre-box {\n   margin: 20px auto;\n   padding: 15px 10px;\n   border-radius: 6px;\n   font-size: 90%;\n   color: white;\n   line-height: 1.6;\n   cursor: pointer;\n   text-align: center;\n   display: block;\n   width: fit-content;\n   background-color: var(--medium-gray);\n   transition: all 0.2s ease;\n   font-weight: bold;\n}",
+      "is_cloze": true
+    },
+    {
+      "name": "language_pattern",
+      "fields": [
+        "source",
+        "description1",
+        "sentence1",
+        "sentenceAnswer1",
+        "hintNegative1",
+        "followUp1",
+        "description2",
+        "sentence2",
+        "sentenceAnswer2",
+        "hintNegative2",
+        "followUp2",
+        "description3",
+        "sentence3",
+        "sentenceAnswer3",
+        "hintNegative3",
+        "followUp3",
+        "description4",
+        "sentenceAnswer4",
+        "sentence4",
+        "hintNegative4",
+        "followUp4",
+        "description5",
+        "sentence5",
+        "sentenceAnswer5",
+        "hintNegative5",
+        "followUp5"
+      ],
+      "templates": {
+        "Card 1": {
+          "Front": "{{source}}<br>\n<span style=\"font-size: 1.2em\">{{#sentence1}}{{sentence1}}{{/sentence1}}</span>\n\n{{#description1}}\n<div class=\"info-block\">{{description1}}</div>\n{{/description1}}\n\n{{#hintNegative1}}\n<div class=\"centre-box\" onclick=\"this.innerHTML='NOT: {{hintNegative1}}'\">\nNOT: [Click to Show]\n</div>\n{{/hintNegative1}}",
+          "Back": "{{source}}<br>\n<hr id=answer>\n<span style=\"font-size: 1.2em\">{{sentenceAnswer1}}</span>\n\n{{#followUp1}}\n  <div class=\"text-block\">Follow-up</div>\n    <span>{{followUp1}}</span>\n{{/followUp1}}"
+        },
+        "Card 2": {
+          "Front": "{{#sentenceAnswer2}}\n{{source}}<br>\n<span style=\"font-size: 1.2em\">{{#sentence2}}{{sentence2}}{{/sentence2}}</span>\n\n{{#description2}}\n<div class=\"info-block\">{{description2}}</div>\n{{/description2}}\n{{/sentenceAnswer2}}",
+          "Back": "{{source}}<br>\n<hr id=answer>\n<span style=\"font-size: 1.2em\">{{sentenceAnswer2}}</span>"
+        },
+        "Card 3": {
+          "Front": "{{#sentenceAnswer3}}\n{{source}}<br>\n<span style=\"font-size: 1.2em\">{{#sentence3}}{{sentence3}}{{/sentence3}}</span>\n\n{{#description3}}\n<div class=\"info-block\">{{description3}}</div>\n{{/description3}}\n{{/sentenceAnswer3}}",
+          "Back": "{{source}}<br>\n<hr id=answer>\n<span style=\"font-size: 1.2em\">{{sentenceAnswer3}}</span>"
+        },
+        "Card 4": {
+          "Front": "{{#sentenceAnswer4}}\n{{source}}<br>\n<span style=\"font-size: 1.2em\">{{#sentence4}}{{sentence4}}{{/sentence4}}</span>\n\n{{#description4}}\n<div class=\"info-block\">{{description4}}</div>\n{{/description4}}\n{{/sentenceAnswer4}}",
+          "Back": "{{source}}<br>\n<hr id=answer>\n<span style=\"font-size: 1.2em\">{{sentenceAnswer4}}</span>"
+        },
+        "Card 5": {
+          "Front": "{{#sentenceAnswer5}}\n{{source}}<br>\n<span style=\"font-size: 1.2em\">{{#sentence5}}{{sentence5}}{{/sentence5}}</span>\n\n{{#description5}}\n<div class=\"info-block\">{{description5}}</div>\n{{/description5}}\n{{/sentenceAnswer5}}",
+          "Back": "{{source}}<br>\n<hr id=answer>\n<span style=\"font-size: 1.2em\">{{sentenceAnswer5}}</span>"
+        }
+      },
+      "css": ":root {\n  --orange: #fb9f2a;\n  --medium-blue: #0f58a7;\n  --medium-gray: #434343;\n}\n\n.card {\n   margin: 20px;\n   padding: 12px;\n   color: white;\n   line-height: 1.8;\n   text-align: center;\n}\n\n.centre-box {\n   margin: 20px auto;\n   padding: 15px 10px;\n   border-radius: 6px;\n   font-size: 90%;\n   color: white;\n   cursor: pointer;\n   text-align: center;\n   display: block;\n   width: fit-content;\n   background-color: var(--medium-gray);\n   font-weight: bold;\n}\n\n.text-block {\n   display: block;\n   width: fit-content;\n   background-color: var(--orange);\n   padding: 0px 8px;\n   margin: 20px 20px 8px;\n   text-align: center;\n   line-height: 1.6;\n   font-size: 90%;\n   color: black;\n}\n\n.info-block {\n   margin: 10px auto;\n   display: block;\n   width: fit-content;\n   border-radius: 4px;\n   background-color: var(--medium-blue);\n   padding: 0px 8px;\n   text-align: center;\n   line-height: 1.6;\n   font-size: 90%;\n}",
+      "is_cloze": false
+    },
+    {
+      "name": "language_polysemy",
+      "fields": [
+        "vocabulary",
+        "vocabularyS",
+        "vocabularyPast",
+        "vocabularyPastPerfect",
+        "vocabularyIng",
+        "pronunciation",
+        "coreMeaning",
+        "inputDefinition1",
+        "example1",
+        "inputDefinition2",
+        "example2",
+        "inputDefinition3",
+        "example3",
+        "inputDefinition4",
+        "example4",
+        "inputDefinition5",
+        "example5"
+      ],
+      "templates": {
+        "Card 1": {
+          "Front": "<span class=\"text-highlight\">{{inputDefinition1}}</span>\n<div style=\"font-size: 1.2em\" id=\"example-sentence\">{{example1}}</div>\n\n<script>\n(function() {\n    const exampleElement = document.getElementById('example-sentence');\n    const forms = [\n        '{{vocabulary}}',\n        '{{vocabularyPast}}',\n        '{{vocabularyPastPerfect}}',\n        '{{vocabularyIng}}',\n        '{{vocabularyS}}'\n    ];\n    if (exampleElement) {\n        let text = exampleElement.innerHTML;\n        forms.forEach(form => {\n            if (form && form.trim() !== '') {\n                const regex = new RegExp('\\\\b' + form + '\\\\b', 'gi');\n                text = text.replace(regex, '<span class=\"cloze-blank\">[...]</span>');\n            }\n        });\n        exampleElement.innerHTML = text;\n    }\n})();\n</script>",
+          "Back": "{{inputDefinition1}}\n<hr id=answer>\n<div id=\"answer-sentence\">{{example1}}</div>\n\n{{#coreMeaning}}\n   <div class=\"text-block\">Core Meaning</div>\n      <span>{{coreMeaning}}</span>\n{{/coreMeaning}}\n\n<script>\n(function() {\n    const answerElement = document.getElementById('answer-sentence');\n    const forms = [\n        '{{vocabulary}}',\n        '{{vocabularyPast}}',\n        '{{vocabularyPastPerfect}}',\n        '{{vocabularyIng}}',\n        '{{vocabularyS}}'\n    ];\n    if (answerElement) {\n        let text = answerElement.innerHTML;\n        forms.forEach(form => {\n            if (form && form.trim() !== '') {\n                const regex = new RegExp('\\\\b' + form + '\\\\b', 'gi');\n                text = text.replace(regex, '<span style=\"color: var(--orange); font-weight: bold;\">' + form + '</span>');\n            }\n        });\n        answerElement.innerHTML = text;\n    }\n})();\n</script>"
+        },
+        "Card 2": {
+          "Front": "{{#inputDefinition2}}\n<span class=\"text-highlight\">{{inputDefinition2}}</span>\n<div style=\"font-size: 1.2em\">{{example2}}</div>\n{{/inputDefinition2}}",
+          "Back": "{{inputDefinition2}}\n<hr id=answer>\n<div>{{example2}}</div>\n\n{{#coreMeaning}}\n   <div class=\"text-block\">Core Meaning</div>\n      <span>{{coreMeaning}}</span>\n{{/coreMeaning}}"
+        },
+        "Card 3": {
+          "Front": "{{#inputDefinition3}}\n<span class=\"text-highlight\">{{inputDefinition3}}</span>\n<div style=\"font-size: 1.2em\">{{example3}}</div>\n{{/inputDefinition3}}",
+          "Back": "{{inputDefinition3}}\n<hr id=answer>\n<div>{{example3}}</div>"
+        },
+        "Card 4": {
+          "Front": "{{#inputDefinition4}}\n<span class=\"text-highlight\">{{inputDefinition4}}</span>\n<div style=\"font-size: 1.2em\">{{example4}}</div>\n{{/inputDefinition4}}",
+          "Back": "{{inputDefinition4}}\n<hr id=answer>\n<div>{{example4}}</div>"
+        },
+        "Card 5": {
+          "Front": "{{#inputDefinition5}}\n<span class=\"text-highlight\">{{inputDefinition5}}</span>\n<div style=\"font-size: 1.2em\">{{example5}}</div>\n{{/inputDefinition5}}",
+          "Back": "{{inputDefinition5}}\n<hr id=answer>\n<div>{{example5}}</div>"
+        }
+      },
+      "css": ":root {\n  --orange: #fb9f2a;\n  --medium-gray: #434343;\n}\n.card {\n   margin: 20px;\n   padding: 12px;\n   color: white;\n   line-height: 1.8;\n   text-align: center;\n}\n.answer {\n  color: var(--orange);\n  font-size: 18px;\n}\n.cloze-blank {\n    color: var(--orange);\n    font-weight: bold;\n}\n.text-highlight {\n   color: var(--orange);\n   padding: 0px 4px;\n   font-size: 1.2em;\n   font-style: italic;\n}\n.text-block {\n   display: block;\n   width: fit-content;\n   background-color: var(--orange);\n   padding: 0px 8px;\n   margin: 20px 20px 8px;\n   line-height: 1.6;\n   font-size: 90%;\n   color: black;\n}\n.text-block + span {\n   display: block;\n   margin-left: 20px;\n   font-size: 85%;\n   line-height: 1.4;\n   text-align: left;\n}",
+      "is_cloze": false
+    },
+    {
+      "name": "language_vocab",
+      "fields": [
+        "front",
+        "back",
+        "pronunciation"
+      ],
+      "templates": {
+        "Card 1": {
+          "Front": "<div class=\"card\">\n    {{front}} {{#pronunciation}} /{{pronunciation}}/{{/pronunciation}}\n</div>",
+          "Back": "{{FrontSide}}\n<hr id=answer>\n    <span class=\"answer\">{{back}}</span>"
+        },
+        "Card 2": {
+          "Front": "<div class=\"card\">{{back}}</div>",
+          "Back": "{{FrontSide}}\n<hr id=answer>\n\n<span class=\"answer\">{{front}} {{#pronunciation}}/{{pronunciation}}/{{/pronunciation}}</span>"
+        }
+      },
+      "css": ":root {\n  --orange: #fb9f2a;\n}\n.card {\n  padding: 20px;\n  text-align: center;\n  font-size: 1.2em;\n  line-height: 1.8;\n}\n\n.answer {\n  color: var(--orange);\n  font-size: 1.2em;\n}",
+      "is_cloze": false
+    },
+    {
+      "name": "image_occlusion",
+      "fields": [
+        "Occlusion",
+        "Image",
+        "Header",
+        "Back Extra",
+        "Comments"
+      ],
+      "templates": {
+        "Image Occlusion": {
+          "Front": "{{#Header}}<div>{{Header}}</div>{{/Header}}\n<div style=\"display: none\">{{cloze:Occlusion}}</div>\n<div id=\"err\"></div>\n<div id=\"image-occlusion-container\">\n    {{Image}}\n    <canvas id=\"image-occlusion-canvas\"></canvas>\n</div>\n<script>\ntry {\n    anki.imageOcclusion.setup();\n} catch (exc) {\n    document.getElementById(\"err\").innerHTML = `Error loading image occlusion. Is your Anki version up to date?<br><br>${exc}`;\n}\n</script>",
+          "Back": "{{#Header}}<div>{{Header}}</div>{{/Header}}\n<div style=\"display: none\">{{cloze:Occlusion}}</div>\n<div id=\"err\"></div>\n<div id=\"image-occlusion-container\">\n    {{Image}}\n    <canvas id=\"image-occlusion-canvas\"></canvas>\n</div>\n<script>\ntry {\n    anki.imageOcclusion.setup();\n} catch (exc) {\n    document.getElementById(\"err\").innerHTML = `Error loading image occlusion. Is your Anki version up to date?<br><br>${exc}`;\n}\n</script>\n\n<div><button id=\"toggle\">Toggle Masks</button></div>\n{{#Back Extra}}<div>{{Back Extra}}</div>{{/Back Extra}}"
+        }
+      },
+      "css": "#image-occlusion-canvas {\n    --inactive-shape-color: #ffeba2;\n    --active-shape-color: #ff8e8e;\n    --inactive-shape-border: 1px #212121;\n    --active-shape-border: 1px #212121;\n    --highlight-shape-color: #ff8e8e00;\n    --highlight-shape-border: 1px #ff8e8e;\n}\n\n.card {\n    font-family: arial;\n    font-size: 20px;\n    text-align: center;\n    color: black;\n    background-color: white;\n}",
+      "is_cloze": true
+    }
+  ]
+}

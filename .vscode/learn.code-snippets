@@ -1,0 +1,69 @@
+{
+  "Section Link": {
+    "prefix": "sect",
+    "body": [
+      "[${1:Section Name}](#${1:Section Name})"
+    ],
+    "description": "Create a link to a section in the current file"
+  },
+  "Image Link": {
+    "prefix": "img",
+    "body": [
+      "![${1:alt text}](${2:project_root/images/${3:filename}})"
+    ],
+    "description": "Create an image link with project_root path"
+  },
+  "Image Link with Caption": {
+    "prefix": "imgcap",
+    "body": [
+      "![${1:alt text}](${2:project_root/images/${3:filename}})",
+      "*${4:Caption}*"
+    ],
+    "description": "Create an image link with caption"
+  },
+  "Section 3 Header": {
+    "prefix": "3h",
+    "body": [
+      "### ${1:Section Name}",
+      ""
+    ],
+    "description": "Create a level 3 section header"
+  },
+  "Section 4 Header": {
+    "prefix": "4h",
+    "body": [
+      "#### ${1:Section Name}",
+      ""
+    ],
+    "description": "Create a level 4 section header"
+  },
+  "Markdown Checkbox": {
+    "prefix": "cb",
+    "body": [
+      "- [ ] ${1:item}"
+    ],
+    "description": "Insert an unchecked Markdown task list item"
+  },
+  "Tips section": {
+    "prefix": "tip",
+    "body": [
+      "> [!TIP] ${1:tip}"
+    ],
+    "description": "Insert a tip section"
+  },
+  "Note section": {
+    "prefix": "note",
+    "body": [
+      "> [!NOTE] ${1:note}"
+    ],
+    "description": "Insert a note section"
+  },
+  "AI-Generated Content Note": {
+    "prefix": "aigen",
+    "body": [
+      "> [!NOTE] **AI-Generated Content**",
+      "> The definitions and explanations above for ${1:topic} were generated with AI assistance and should be verified against course materials and textbooks."
+    ],
+    "description": "Insert AI-generated content disclaimer note"
+  }
+}
