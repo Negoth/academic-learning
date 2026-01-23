@@ -112,14 +112,37 @@ Available slash commands when using Claude Code:
 
 ### CLI Scripts
 
+#### Create Note CLI
+
+Interactive note creation with vim-style navigation:
+
 ```bash
-# Create a new literature note
-./scripts/create_literature_note_cli.sh
-
-# Create a general note
 ./scripts/create_note_cli.sh
+```
 
-# Send Anki request manually
+- **Note types**: `class` (Cornell-style), `brainstorm` (assignment planning), `temp` (minimal)
+- **Locations**: Current directory or select from `projects/` subdirectories
+- **Navigation**: `j/k` or arrows to move, `gg`/`G` for top/bottom, `q` to quit
+
+See [src/create-note/README.md](src/create-note/README.md) for details.
+
+#### Literature Note CLI
+
+BibTeX-integrated literature note creation:
+
+```bash
+./scripts/create_literature_note_cli.sh
+```
+
+- **Actions**: `create-reference` (new paper), `create-subnote` (chapter/section/concept)
+- **Reference selection**: Search by citekey or title, sorted by year
+- **Auto-linking**: Sub-notes linked in parent's "Related Notes" section
+
+See [src/literature-note/README.md](src/literature-note/README.md) for details.
+
+#### Send Anki Request
+
+```bash
 uv run python scripts/send_anki_request.py -f tmp/anki_request.json
 ```
 
