@@ -4,10 +4,6 @@ Interactive literature note creation tool.
 
 Usage:
     python src/literature-note/create_literature_note_cli.py
-
-Prerequisites:
-    - bibtexparser: Install with `uv add bibtexparser`
-    - BibTeX file: Either symlink at src/literature-note/references.bib or ~/Zotero/better-bibtex/My Library.bib
 """
 from __future__ import annotations
 
@@ -48,7 +44,7 @@ class BibEntry:
     year: str
     entry_type: str
     authors: str
-    keywords: str
+    url: str = ""
 
 
 # ANSI color codes
@@ -120,6 +116,7 @@ def _render_menu_inline(
             lines.append(f"    {option}")
 
     # Print all lines, clearing each line first
+    # Use \r\n for raw mode compatibility (raw mode doesn't auto-CR on LF)
     for line in lines:
         sys.stdout.write(f"\033[K{line}\r\n")
 
@@ -319,9 +316,9 @@ def _parse_bibtex_entries(bib_path: Path) -> list[BibEntry]:
             .replace(" and ", ", ")
             .strip()
         )
-        keywords = entry.get("keywords", "").strip()
         citekey = entry.get("ID", "").strip()
         entry_type = entry.get("ENTRYTYPE", "").strip()
+        url = entry.get("url", "").strip()
 
         entries.append(
             BibEntry(
@@ -329,8 +326,8 @@ def _parse_bibtex_entries(bib_path: Path) -> list[BibEntry]:
                 title=title,
                 year=year,
                 entry_type=entry_type,
+                url=url,
                 authors=authors,
-                keywords=keywords,
             )
         )
 
@@ -342,19 +339,17 @@ def _parse_bibtex_entries(bib_path: Path) -> list[BibEntry]:
 
 def _render_reference_note(entry: BibEntry) -> str:
     authors = entry.authors or ""
-    keywords = entry.keywords or ""
     return (
         "---\n"
         f'title: "{entry.title}"\n'
         f"authors: {authors}\n"
         f"year: {entry.year}\n"
         f"type: {entry.entry_type}\n"
-        f"keywords: {keywords}\n"
         f"citekey: {entry.citekey}\n"
+        f"url: {entry.url}\n"
         "tags:\n"
         "printed:\n"
         "---\n"
-        f"# {entry.title}\n"
         "\n"
         "## Related Notes\n"
         "\n"
@@ -374,11 +369,9 @@ def _render_reference_note(entry: BibEntry) -> str:
         "\n"
         "### Keywords\n"
         "\n"
-        "### Memo\n"
+        "## Summary\n"
         "\n"
-        "### Summary\n"
-        "\n"
-        "## Post-Reading Assessment\n"
+        "### Writing Assessment\n"
         "\n"
         "## Questions\n"
         "\n"
@@ -392,8 +385,6 @@ def _render_chapter_section_note(title: str, created: str, tags_yaml: str) -> st
         f"created: {created}\n"
         f"tags: {tags_yaml}\n"
         "---\n"
-        f"# {title}\n"
-        "\n"
         "## Related Notes\n"
         "\n"
         "## Keywords\n"
@@ -426,8 +417,6 @@ def _render_concept_note(title: str, created: str, tags_yaml: str) -> str:
         f"created: {created}\n"
         f"tags: {tags_yaml}\n"
         "---\n"
-        f"# {title}\n"
-        "\n"
         "## Related Notes\n"
         "\n"
         "## Memo\n"
@@ -470,37 +459,6 @@ def _append_related_link(note_path: Path, link_stem: str) -> bool:
     return True
 
 
-def _read_input_with_quick_quit(prompt: str) -> str:
-    """Read input, but quit immediately if 'q' is pressed alone."""
-    sys.stdout.write(prompt)
-    sys.stdout.flush()
-
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-
-    # Read first char in raw mode to check for 'q'
-    tty.setraw(fd)
-    first_char = sys.stdin.read(1)
-
-    if first_char.lower() == "q":
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        print()  # Newline after prompt
-        sys.exit(0)
-
-    # Restore cooked mode and read rest of line
-    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-
-    # Echo first char and read rest
-    sys.stdout.write(first_char)
-    sys.stdout.flush()
-
-    if first_char in ("\r", "\n"):
-        print()
-        return ""
-
-    rest = input()  # Read rest of line (already in cooked mode)
-    return first_char + rest
-
 
 def _select_bib_entry(entries: list[BibEntry]) -> BibEntry:
     c = _Colors
@@ -510,11 +468,13 @@ def _select_bib_entry(entries: list[BibEntry]) -> BibEntry:
         for idx, entry in enumerate(current_list, start=1):
             year_label = entry.year or "n.d."
             title = _sanitize_title(entry.title)
-            print(f"  {c.GREEN}{idx}.{c.RESET} {entry.citekey} {c.DIM}({year_label}){c.RESET} - {title}")
+            print(f"  {c.GREEN}{idx}.{c.RESET} {entry.citekey} {c.DIM}({year_label}){c.RESET} — {title}")
 
-        raw = _read_input_with_quick_quit(f"\n{c.BRIGHT_GREEN}?{c.RESET} Select by number or search {c.DIM}(q to quit){c.RESET}: ").strip()
+        raw = input(f"\n{c.BRIGHT_GREEN}?{c.RESET} Select by number or search {c.DIM}(q + Enter to cancel){c.RESET}: ").strip()
         if not raw:
             continue
+        if raw.lower() == "q":
+            sys.exit(0)
         if raw.isdigit():
             index = int(raw) - 1
             if 0 <= index < len(current_list):
@@ -564,6 +524,31 @@ def _get_reference_paths(root: Path, entry: BibEntry) -> tuple[Path, Path]:
     return target_dir, note_path
 
 
+def _find_existing_reference_directory(root: Path, entry: BibEntry) -> Path | None:
+    """Find existing directory matching citekey pattern, regardless of title slug."""
+    year = entry.year or "unknown"
+    base_key = _split_citekey_year(entry.citekey, year)
+    slug_key = _sanitize_slug(base_key or entry.citekey)
+    
+    # Search for directories matching pattern: {slug_key}-{year}-*
+    pattern = f"{slug_key}-{year}-*"
+    notebook_dir = root / "literature-notebook"
+    if not notebook_dir.exists():
+        return None
+    
+    matches = list(notebook_dir.glob(pattern))
+    # Prefer exact match if it exists, otherwise return first match
+    exact_dir = notebook_dir / f"{slug_key}-{year}-{_sanitize_slug(entry.title)}"
+    if exact_dir.exists() and exact_dir.is_dir():
+        return exact_dir
+    if matches:
+        # Return first directory match
+        for match in matches:
+            if match.is_dir():
+                return match
+    return None
+
+
 def _create_reference_note_for_entry(
     root: Path, entry: BibEntry
 ) -> tuple[Path, Path]:
@@ -573,11 +558,11 @@ def _create_reference_note_for_entry(
 
     c = _Colors
     if note_path.exists():
-        print(f"{c.CYAN}i{c.RESET} Reference note already exists: {note_path}")
+        print(f"{c.CYAN}ℹ{c.RESET} Reference note already exists: {note_path}")
         return target_dir, note_path
 
     note_path.write_text(_render_reference_note(entry), encoding="utf-8")
-    print(f"{c.BRIGHT_GREEN}v{c.RESET} Created reference note: {c.CYAN}{note_path}{c.RESET}")
+    print(f"{c.BRIGHT_GREEN}✓{c.RESET} Created reference note: {c.CYAN}{note_path}{c.RESET}")
     return target_dir, note_path
 
 
@@ -589,13 +574,14 @@ def _get_or_create_reference_context(
     target_dir, note_path = _get_reference_paths(root, entry)
 
     c = _Colors
+    # First check for exact match
     if target_dir.exists():
         # Directory exists, check for reference note
         existing_note = note_path if note_path.exists() else None
         if existing_note:
-            print(f"{c.CYAN}i{c.RESET} Using existing reference: {c.BOLD}{target_dir.name}{c.RESET}")
+            print(f"{c.CYAN}ℹ{c.RESET} Using existing reference: {c.BOLD}{target_dir.name}{c.RESET}")
         else:
-            print(f"{c.YELLOW}!{c.RESET} Directory exists but no reference note: {target_dir.name}")
+            print(f"{c.YELLOW}⚠{c.RESET} Directory exists but no reference note: {target_dir.name}")
             if _prompt_yes_no("Create reference note?", default=True):
                 _create_reference_note_for_entry(root, entry)
                 existing_note = note_path
@@ -603,15 +589,39 @@ def _get_or_create_reference_context(
             directory=target_dir, reference_note=existing_note, entry=entry
         )
 
+    # If exact match doesn't exist, search for directories matching citekey pattern
+    existing_dir = _find_existing_reference_directory(root, entry)
+    if existing_dir:
+        # Found existing directory with matching citekey, use it
+        # Recalculate note_path using the existing directory
+        year = entry.year or "unknown"
+        base_key = _split_citekey_year(entry.citekey, year)
+        slug_key = _sanitize_slug(base_key or entry.citekey)
+        filename = f"{slug_key}-{year}-reference-note.md"
+        existing_note_path = existing_dir / filename
+        
+        existing_note = existing_note_path if existing_note_path.exists() else None
+        if existing_note:
+            print(f"{c.CYAN}ℹ{c.RESET} Using existing reference: {c.BOLD}{existing_dir.name}{c.RESET}")
+        else:
+            print(f"{c.YELLOW}⚠{c.RESET} Directory exists but no reference note: {existing_dir.name}")
+            if _prompt_yes_no("Create reference note?", default=True):
+                existing_note_path.write_text(_render_reference_note(entry), encoding="utf-8")
+                print(f"{c.BRIGHT_GREEN}✓{c.RESET} Created reference note: {c.CYAN}{existing_note_path}{c.RESET}")
+                existing_note = existing_note_path
+        return ReferenceContext(
+            directory=existing_dir, reference_note=existing_note, entry=entry
+        )
+
     # Directory doesn't exist
-    print(f"{c.CYAN}i{c.RESET} No existing directory for: {entry.title[:60]}...")
+    print(f"{c.CYAN}ℹ{c.RESET} No existing directory for: {entry.title[:60]}...")
     if not _prompt_yes_no("Create reference note first?", default=True):
         print(f"{c.DIM}Cannot create subnote without reference directory.{c.RESET}")
         sys.exit(0)
 
     _create_reference_note_for_entry(root, entry)
     if not _prompt_yes_no("Continue to create subnote?", default=True):
-        print(f"{c.BRIGHT_GREEN}v{c.RESET} Done.")
+        print(f"{c.BRIGHT_GREEN}✓{c.RESET} Done.")
         sys.exit(0)
 
     return ReferenceContext(
@@ -626,12 +636,12 @@ def _create_reference_note(root: Path) -> None:
     target_dir, note_path = _get_reference_paths(root, entry)
 
     if note_path.exists():
-        print(f"{c.YELLOW}!{c.RESET} Reference note already exists: {note_path}", file=sys.stderr)
+        print(f"{c.YELLOW}⚠{c.RESET} Reference note already exists: {note_path}", file=sys.stderr)
         sys.exit(1)
 
     target_dir.mkdir(parents=True, exist_ok=True)
     note_path.write_text(_render_reference_note(entry), encoding="utf-8")
-    print(f"{c.BRIGHT_GREEN}v{c.RESET} Created reference note: {c.CYAN}{note_path}{c.RESET}")
+    print(f"{c.BRIGHT_GREEN}✓{c.RESET} Created reference note: {c.CYAN}{note_path}{c.RESET}")
 
 
 def _select_note_in_directory(directory: Path, prompt: str) -> Path:
@@ -696,7 +706,7 @@ def _create_subnote(root: Path) -> None:
         c = _Colors
         if reference_context.reference_note:
             _append_related_link(reference_context.reference_note, note_path.stem)
-        print(f"{c.BRIGHT_GREEN}v{c.RESET} Created chapter note: {c.CYAN}{note_path}{c.RESET}")
+        print(f"{c.BRIGHT_GREEN}✓{c.RESET} Created chapter note: {c.CYAN}{note_path}{c.RESET}")
         return
 
     if note_type == "section":
@@ -709,7 +719,7 @@ def _create_subnote(root: Path) -> None:
         filename = f"sec{section_id}-{slug_title}.md"
         note_path = reference_context.directory / filename
         if note_path.exists():
-            print(f"{c.YELLOW}!{c.RESET} File already exists: {note_path}", file=sys.stderr)
+            print(f"{c.YELLOW}⚠{c.RESET} File already exists: {note_path}", file=sys.stderr)
             sys.exit(1)
 
         note_path.write_text(
@@ -740,10 +750,10 @@ def _create_subnote(root: Path) -> None:
             _append_related_link(reference_context.reference_note, note_path.stem)
         else:
             print(
-                f"{c.YELLOW}!{c.RESET} No chapter or reference note found to link. Skipping link insertion.",
+                f"{c.YELLOW}⚠{c.RESET} No chapter or reference note found to link. Skipping link insertion.",
                 file=sys.stderr,
             )
-        print(f"{c.BRIGHT_GREEN}v{c.RESET} Created section note: {c.CYAN}{note_path}{c.RESET}")
+        print(f"{c.BRIGHT_GREEN}✓{c.RESET} Created section note: {c.CYAN}{note_path}{c.RESET}")
         return
 
     if note_type == "concept":
@@ -755,7 +765,7 @@ def _create_subnote(root: Path) -> None:
         filename = f"{_sanitize_slug(concept_title)}.md"
         note_path = reference_context.directory / filename
         if note_path.exists():
-            print(f"{c.YELLOW}!{c.RESET} File already exists: {note_path}", file=sys.stderr)
+            print(f"{c.YELLOW}⚠{c.RESET} File already exists: {note_path}", file=sys.stderr)
             sys.exit(1)
 
         note_path.write_text(
@@ -763,7 +773,7 @@ def _create_subnote(root: Path) -> None:
             encoding="utf-8",
         )
         _append_related_link(target_note, note_path.stem)
-        print(f"{c.BRIGHT_GREEN}v{c.RESET} Created concept note: {c.CYAN}{note_path}{c.RESET}")
+        print(f"{c.BRIGHT_GREEN}✓{c.RESET} Created concept note: {c.CYAN}{note_path}{c.RESET}")
         return
 
 

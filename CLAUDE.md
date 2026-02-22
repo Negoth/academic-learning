@@ -32,10 +32,9 @@ style: lint/format
 - Use `UPPER_CASE` for constants
 - Use `pathlib.Path` for file operations
 - Prefer f-strings for string formatting
-- Import order: standard library -> third-party -> local
+- Import order: standard library → third-party → local
 
 **Scripts structure**:
-- Include shebang: `#!/usr/bin/env python3`
 - Add docstrings with Usage section
 - Use `if __name__ == "__main__":` for executable code
 
@@ -53,44 +52,38 @@ style: lint/format
 - Use standard markdown headings (`#`, `##`, `###`)
 - Never use `---` as a section divider in markdown documents
 
-**Formatting (markdownlint compliance)**:
-- Add blank line before and after headings
-- Add blank line before and after lists
-- Add blank line before and after code blocks
-- No trailing spaces at end of lines
-- Use spaces for indentation (no hard tabs)
-- Maximum one blank line between paragraphs
-
 ## Project Structure
 
 ```
 learn/
-|-- projects/                         # All project/module content and tasks
-|   |-- QMA-7106A                     # Example: MA25 modules directly under projects/
-|   +-- ...                           # Future projects and tasks
-|-- literature-notebook/              # Literature notes
-|-- scripts/                          # Cross-project level manual scripts
-|-- src/                              # Script logic definitions (shared code)
-|   |-- literature-note/              # Literature note creation CLI
-|   |-- create-note/                  # General note creation CLI
-|   +-- anki_connect/                 # Anki integration utilities
-|-- images/                           # Images cited in markdown files
-|-- tmp/                              # Temporary files
-+-- .claude/                          # Claude Code commands and skills
+├── projects/                         # All project/module content and tasks
+│   ├── QMA-7106A                     # MA25 modules directly under projects/
+│   └── ...                           # Future projects and tasks
+├── literature-notebook/              # Literature notes
+├── scripts/                          # Cross-project level manual scripts
+├── src/                              # Script logic definitions (shared code)
+│   ├── beamer-template/              # Beamer presentation template
+│   ├── latex-template/               # LaTeX document template
+│   ├── literature-note/              # Literature note creation CLI
+│   ├── create-note/                  # General note creation CLI
+│   ├── anki_connect/                 # Anki integration utilities
+│   └── stata-dofile-processor/       # Stata do-file processing utilities
+├── images/                           # Images cited in markdown files
+├── tmp/                              # Temporary files
+└── .claude/                          # Claude Code commands and skills
 ```
 
 ## Language Learning Assistance
 
-**IMPORTANT**: When user asks questions about English or French language (words, phrases, grammar, usage, translations):
+When user asks questions about English or French language (words, phrases, grammar, usage, translations):
 
-1. **Invoke the appropriate language tutor agent**:
-   - English questions -> `@.claude/agents/english-tutor.md`
-   - French questions -> `@.claude/agents/french-tutor.md`
+1. **Answer directly** with appropriate language expertise:
+   - English questions: British English (spelling, vocabulary, idioms), IPA (Received Pronunciation), cultural context, register (formal/informal)
+   - French questions: Proper diacritics (é, è, ê, ç, etc.), gender markers for nouns (le/la), IPA, formal/informal register (tu/vous)
 
-2. **The tutor agent will**:
-   - Answer the question with language expertise
-   - Offer to create Anki cards after answering
-   - If user accepts, guide them through note type selection
+2. **After answering**, offer Anki card creation:
+   - Ask: "Would you like me to create Anki cards for this?"
+   - If yes, use the appropriate skill: `/anki-english` or `/anki-french`
 
 **Examples of language questions**:
 - "What does 'faff about' mean?"
@@ -98,5 +91,3 @@ learn/
 - "What's the difference between 'joli' and 'beau'?"
 - "How do I use the subjunctive in French?"
 - "What are some British idioms for being tired?"
-
-**DO NOT** answer language questions directly - always delegate to the tutor agents so they can offer Anki card creation.

@@ -10,10 +10,32 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+import atexit
 import re
+import shutil
+import signal
 import sys
 import termios
 import tty
+
+
+def _cleanup_terminal(*args) -> None:
+    """Cleanup handler for signals and exit - ensures cursor is visible."""
+    print("\033[?25h", end="", flush=True)
+    if args:
+        print()
+        sys.exit(0)
+
+
+# ANSI color codes
+class _Colors:
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    GREEN = "\033[32m"
+    BRIGHT_GREEN = "\033[1;32m"
+    CYAN = "\033[36m"
+    YELLOW = "\033[33m"
 
 
 @dataclass(frozen=True)
@@ -23,30 +45,79 @@ class LocationChoice:
     project: str
 
 
-def _read_key() -> str:
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        char = sys.stdin.read(1)
-        if char == "\x1b":
-            char += sys.stdin.read(2)
-        return char
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+def _truncate_text(text: str, max_width: int) -> str:
+    if len(text) <= max_width:
+        return text
+    if max_width <= 3:
+        return text[:max_width]
+    return text[: max_width - 3] + "..."
 
 
-def _render_menu(title: str, options: list[str], current_idx: int) -> None:
-    print("\033[H\033[J", end="")
-    print(title)
-    print("Use j/k (or arrows) to move, Enter to select.")
-    print("gg: top, G: bottom, q: quit.\n")
-    for idx, option in enumerate(options):
-        prefix = ">" if idx == current_idx else " "
-        print(f" {prefix} {option}")
+def _render_menu_inline(
+    title: str,
+    options: list[str],
+    current_idx: int,
+    prev_lines: int = 0,
+) -> int:
+    term_size = shutil.get_terminal_size(fallback=(80, 24))
+    term_width = term_size.columns
+    term_height = term_size.lines
+
+    if prev_lines > 0:
+        print(f"\033[{prev_lines}A", end="")
+
+    c = _Colors
+    lines: list[str] = []
+    lines.append(f"{c.BRIGHT_GREEN}?{c.RESET} {c.BOLD}{title}{c.RESET}")
+    lines.append(f"{c.DIM}  Use j/k (or arrows) to move, Enter to select.{c.RESET}")
+    lines.append(f"{c.DIM}  gg: top, G: bottom, q: quit.{c.RESET}")
+
+    total = len(options)
+    header_lines = 5
+    list_height = max(min(term_height - header_lines, 15), 5)
+
+    if total <= list_height:
+        start_idx = 0
+        end_idx = total
+    else:
+        half_window = list_height // 2
+        start_idx = max(current_idx - half_window, 0)
+        end_idx = start_idx + list_height
+        if end_idx > total:
+            end_idx = total
+            start_idx = max(end_idx - list_height, 0)
+
+    lines.append(f"{c.DIM}  Showing {start_idx + 1}-{end_idx} of {total}.{c.RESET}")
+    lines.append("")
+
+    max_option_width = term_width - 6
+    for idx in range(start_idx, end_idx):
+        option = _truncate_text(options[idx], max_option_width)
+        if idx == current_idx:
+            lines.append(f"  {c.BRIGHT_GREEN}>{c.RESET} {c.CYAN}{option}{c.RESET}")
+        else:
+            lines.append(f"    {option}")
+
+    for line in lines:
+        sys.stdout.write(f"\033[K{line}\r\n")
+
+    sys.stdout.flush()
+    return len(lines)
+
+
+def _clear_menu_lines(num_lines: int) -> None:
+    if num_lines > 0:
+        print(f"\033[{num_lines}A", end="")
+        for _ in range(num_lines):
+            print("\033[K")
+        print(f"\033[{num_lines}A", end="", flush=True)
 
 
 def _prompt_choice(title: str, options: list[str]) -> int:
+    if not options:
+        print("No options available.", file=sys.stderr)
+        sys.exit(1)
+
     if not sys.stdin.isatty():
         print(title)
         for idx, option in enumerate(options, start=1):
@@ -64,31 +135,52 @@ def _prompt_choice(title: str, options: list[str]) -> int:
 
     current_idx = 0
     last_key = ""
-    _render_menu(title, options, current_idx)
-    while True:
-        key = _read_key()
-        if key in ("\r", "\n"):
-            print()
-            return current_idx
-        if key in ("q", "Q"):
-            print("\nCancelled.")
-            sys.exit(0)
-        if key in ("k", "\x1b[A"):
-            current_idx = (current_idx - 1) % len(options)
-            last_key = ""
-        elif key in ("j", "\x1b[B"):
-            current_idx = (current_idx + 1) % len(options)
-            last_key = ""
-        elif key == "G":
-            current_idx = len(options) - 1
-            last_key = ""
-        elif key == "g":
-            if last_key == "g":
-                current_idx = 0
+
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    print("\033[?25l", end="", flush=True)
+    tty.setraw(fd)
+
+    def _restore_and_exit(clear_lines: int, message: str | None = None) -> None:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        _clear_menu_lines(clear_lines)
+        print("\033[?25h", end="", flush=True)
+        if message:
+            print(message)
+
+    try:
+        num_lines = _render_menu_inline(title, options, current_idx, prev_lines=0)
+        while True:
+            char = sys.stdin.read(1)
+            if char == "\x1b":
+                char += sys.stdin.read(2)
+
+            if char in ("\r", "\n"):
+                _restore_and_exit(num_lines)
+                return current_idx
+            if char in ("q", "Q"):
+                _restore_and_exit(num_lines, "Cancelled.")
+                sys.exit(0)
+            if char in ("k", "\x1b[A"):
+                current_idx = (current_idx - 1) % len(options)
                 last_key = ""
-            else:
-                last_key = "g"
-        _render_menu(title, options, current_idx)
+            elif char in ("j", "\x1b[B"):
+                current_idx = (current_idx + 1) % len(options)
+                last_key = ""
+            elif char == "G":
+                current_idx = len(options) - 1
+                last_key = ""
+            elif char == "g":
+                if last_key == "g":
+                    current_idx = 0
+                    last_key = ""
+                else:
+                    last_key = "g"
+            num_lines = _render_menu_inline(title, options, current_idx, prev_lines=num_lines)
+    except Exception:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        print("\033[?25h", end="", flush=True)
+        raise
 
 
 def _list_project_dirs(projects_dir: Path) -> list[Path]:
@@ -126,20 +218,25 @@ def _choose_location(root: Path) -> LocationChoice:
 
 
 def _sanitize_filename(title: str) -> str:
-    sanitized = re.sub(r'[\\/:*?"<>|]', "_", title.strip())
-    return sanitized or "untitled"
+    cleaned = title.strip().lower()
+    cleaned = cleaned.replace("&", "and")
+    cleaned = re.sub(r"[^a-z0-9]+", "-", cleaned)
+    cleaned = cleaned.strip("-")
+    return cleaned or "untitled"
 
 
 def _prompt_title() -> str:
+    c = _Colors
     while True:
-        title = input("Note title: ").strip()
+        title = input(f"{c.BRIGHT_GREEN}?{c.RESET} Note title: ").strip()
         if title:
             return title
-        print("Title cannot be empty.")
+        print(f"{c.YELLOW}Title cannot be empty.{c.RESET}")
 
 
 def _prompt_tags() -> str:
-    raw = input("Tags (comma-separated, optional): ").strip()
+    c = _Colors
+    raw = input(f"{c.BRIGHT_GREEN}?{c.RESET} Tags {c.DIM}(comma-separated, optional){c.RESET}: ").strip()
     if not raw:
         return "[]"
 
@@ -163,7 +260,6 @@ def _render_class_note(title: str, project: str, created: str, tags_yaml: str) -
         f"created: {created}\n"
         f"tags: {tags_yaml}\n"
         "---\n"
-        f"# {title}\n"
         "\n"
         "## Readings\n"
         "\n"
@@ -173,19 +269,16 @@ def _render_class_note(title: str, project: str, created: str, tags_yaml: str) -
         "\n"
         "### Keywords\n"
         "\n"
-        "### Questions\n"
-        "\n"
         "## Notes (Lecture Notes)\n"
         "<!-- Right column: main lecture notes. Use concise bullets, examples, formulas. -->\n"
         "\n"
         "## Summary (After Class)\n"
         "<!-- Bottom summary: 3-5 sentence synthesis of the session. -->\n"
         "\n"
+        "## Questions\n"
+        "\n"
         "## Assignments / Next Steps\n"
         "<!-- Homework, readings, or actions before next session. -->\n"
-        "\n"
-        "## Personal Insights\n"
-        "<!-- Thoughts, confusions to clarify, connections to prior knowledge. -->\n"
     )
 
 
@@ -199,8 +292,6 @@ def _render_brainstorm_note(
         f"created: {created}\n"
         f"tags: {tags_yaml}\n"
         "---\n"
-        f"# {title}\n"
-        "\n"
         "## Brief\n"
         "<!-- What is the assignment asking? Scope, deliverables, evaluation criteria. -->\n"
         "\n"
@@ -229,12 +320,14 @@ def _render_temp_note(
         f"created: {created}\n"
         f"tags: {tags_yaml}\n"
         "---\n"
-        f"# {title}\n"
-        "\n"
     )
 
 
 def main() -> None:
+    atexit.register(_cleanup_terminal)
+    signal.signal(signal.SIGINT, _cleanup_terminal)
+    signal.signal(signal.SIGTERM, _cleanup_terminal)
+
     root = Path(__file__).resolve().parents[2]
 
     location = _choose_location(root)
@@ -249,8 +342,9 @@ def main() -> None:
     filename = _sanitize_filename(title) + ".md"
     output_path = location.path / filename
 
+    c = _Colors
     if output_path.exists():
-        print(f"File already exists: {output_path}", file=sys.stderr)
+        print(f"{c.YELLOW}File already exists: {output_path}{c.RESET}", file=sys.stderr)
         sys.exit(1)
 
     if note_type == "class":
@@ -265,7 +359,7 @@ def main() -> None:
         sys.exit(1)
 
     output_path.write_text(content, encoding="utf-8")
-    print(f"Created: {output_path}")
+    print(f"{c.BRIGHT_GREEN}Created:{c.RESET} {c.CYAN}{output_path}{c.RESET}")
 
 
 if __name__ == "__main__":

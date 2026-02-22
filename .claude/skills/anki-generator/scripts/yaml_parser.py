@@ -12,7 +12,7 @@ Usage:
     deck: English
     fields:
       front: "Example"
-      back: "example"
+      back: "例"
     tags:
       - language::english
     '''
@@ -153,9 +153,9 @@ if __name__ == "__main__":
 note_type: language_vocab
 deck: English
 fields:
-  front: "Someone who is a bit more reserved."
-  back: "A reserved person is quiet and shy"
-  pronunciation: "ri'zervd"
+  front: "Japanese people are a bit more reserved."
+  back: "日本人はもうちょっと控えめやね"
+  pronunciation: "rɪˈzɜːvd"
 tags:
   - language::english::vocabulary
 """
@@ -174,8 +174,8 @@ tags:
 - note_type: language_cloze
   deck: English
   fields:
-    Text: "Before we go, {{c1::do you have any questions::any questions}}?"
-    clozeHint: "asking questions"
+    Text: "Before we go, {{c1::do you have any questions::何か質問ある}}?"
+    clozeHint: "何か質問ある"
   tags:
     - language::english::phrases
 
@@ -183,7 +183,7 @@ tags:
   deck: English
   fields:
     front: "reserved"
-    back: "quiet and shy"
+    back: "控えめ"
   tags:
     - language::english
 """

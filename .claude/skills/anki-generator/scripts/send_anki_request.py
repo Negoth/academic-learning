@@ -8,7 +8,9 @@ import sys
 from typing import Any, Dict
 
 # Add project root to Python path so we can import from src/
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# send_anki_request.py -> scripts/ -> anki-generator/ -> skills/ -> .claude/ -> project root
+_here = os.path.abspath(__file__)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_here)))))
 sys.path.insert(0, project_root)
 
 from src.anki_connect import DEFAULT_ANKI_CONNECT_URL, invoke
