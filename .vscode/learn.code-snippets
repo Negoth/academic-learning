@@ -9,15 +9,15 @@
   "Image Link": {
     "prefix": "img",
     "body": [
-      "![${1:alt text}](${2:project_root/images/${3:filename}})"
+      "![${1:alt text}](${/images/${2:filename}})"
     ],
-    "description": "Create an image link with project_root path"
+    "description": "Create an image link"
   },
   "Image Link with Caption": {
     "prefix": "imgcap",
     "body": [
-      "![${1:alt text}](${2:project_root/images/${3:filename}})",
-      "*${4:Caption}*"
+      "![${1:alt text}](${/images/${2:filename}})",
+      "*${3:Caption}*"
     ],
     "description": "Create an image link with caption"
   },
@@ -57,6 +57,27 @@
       "> [!NOTE] ${1:note}"
     ],
     "description": "Insert a note section"
+  },
+  "Important section": {
+    "prefix": "imp",
+    "body": [
+      "> [!IMPORTANT] ${1:Important}"
+    ],
+    "description": "Insert an important section"
+  },
+  "Warning section": {
+    "prefix": "warn",
+    "body": [
+      "> [!WARNING] ${1:Warning}"
+    ],
+    "description": "Insert a warning section"
+  },
+  "Caution section": {
+    "prefix": "caut",
+    "body": [
+      "> [!CAUTION] ${1:Caution}"
+    ],
+    "description": "Insert a caution section"
   },
   "AI-Generated Content Note": {
     "prefix": "aigen",
