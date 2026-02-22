@@ -3,7 +3,12 @@ allowed-tools: Read,Edit
 description: Add tags to markdown file frontmatter
 ---
 
-Add tags to markdown frontmatter: $ARGUMENTS
+Add tags to yaml frontmatter of markdown files: $ARGUMENTS.
+
+## Find files
+
+If directory given, find all `.md` files.
+If single file, use that file.
 
 ## Instructions
 

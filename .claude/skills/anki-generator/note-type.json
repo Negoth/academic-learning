@@ -25,7 +25,7 @@
     "language_pattern": {
       "fields": {
         "source": {
-          "description": "Source word or phrase",
+          "description": "Japanese word or phrase",
           "required": true
         },
         "description1": {

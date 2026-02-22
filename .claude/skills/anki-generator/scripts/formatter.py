@@ -59,8 +59,8 @@ def format_pattern_fields(fields: Dict[str, Any]) -> Dict[str, Any]:
     """Format pattern synonym fields.
 
     Transforms:
-    - sentence: **word** -> <span>[...]</span>
-    - sentenceAnswer: **word** -> <span>word</span>
+    - sentence: **word** → <span>[...]</span>
+    - sentenceAnswer: **word** → <span>word</span>
 
     Args:
         fields: Field dictionary for language_pattern note type
@@ -108,8 +108,8 @@ def format_vocab_fields(fields: Dict[str, Any]) -> Dict[str, Any]:
     """Format vocabulary fields.
 
     Transforms:
-    - front: **word** -> <span style="color: rgb(255, 170, 127);">word</span>
-    - back: **word** -> <span style="color: rgb(255, 170, 127);">word</span>
+    - front: **word** → <span style="color: rgb(255, 170, 127);">word</span>
+    - back: **word** → <span style="color: rgb(255, 170, 127);">word</span>
 
     Args:
         fields: Field dictionary for language_vocab note type
@@ -165,7 +165,7 @@ if __name__ == "__main__":
 
     # Test pattern formatting
     pattern_fields = {
-        "source": "efficient",
+        "source": "効率化する",
         "sentence1": "I'm trying to make the process more **efficient**",
         "sentenceAnswer1": "I'm trying to make the process more efficient",
         "sentence2": "We need to **streamline** the workflow",
@@ -181,9 +181,9 @@ if __name__ == "__main__":
 
     # Test vocab formatting
     vocab_fields = {
-        "front": "Someone who is a bit more **reserved**.",
-        "back": "A **reserved** person is quiet and shy",
-        "pronunciation": "ri'zervd"
+        "front": "Japanese people are a bit more **reserved**.",
+        "back": "日本人はもうちょっと**控えめ**やね",
+        "pronunciation": "rɪˈzɜːvd"
     }
 
     print("\n=== Vocab Type ===")
@@ -195,8 +195,8 @@ if __name__ == "__main__":
 
     # Test cloze (should be unchanged)
     cloze_fields = {
-        "Text": "Before we go, {{c1::do you have any questions::any questions}}?",
-        "clozeHint": "asking questions"
+        "Text": "Before we go, {{c1::do you have any questions::何か質問ある}}?",
+        "clozeHint": "何か質問ある"
     }
 
     print("\n=== Cloze Type ===")

@@ -12,7 +12,9 @@ Generate Anki flashcards from mathematics and statistics content.
 
 1. Invoke the Anki Generator skill: @.claude/skills/anki-generator/SKILL.md
 
-2. Process the markdown file(s): $ARGUMENTS
+2. Process content based on $ARGUMENTS:
+   - **If $ARGUMENTS is a file path(s)**: Process the markdown file(s) directly
+   - **If $ARGUMENTS is a brief description**: Extract relevant content from the conversation history based on the description, then create Anki cards from that content
 
 3. Expected content tags:
    - `statistics/*`
@@ -28,8 +30,12 @@ Generate Anki flashcards from mathematics and statistics content.
 
 ```bash
 # Single file
-/anki-math-stat projects/statistics/notes/regression.md
+/anki-math-stat projects/QMA-7106A/notes/statistics.md
 
 # Multiple files
-/anki-math-stat projects/statistics/notes/Chapter*.md
+/anki-math-stat projects/QMA-7106A/notes/Chapter*.md
+
+# From conversation content
+/anki-math-stat t統計量と標準誤差について
+/anki-math-stat 先ほどの説明から
 ```
